@@ -7,7 +7,6 @@ const router = new express.Router()
 
 //signup
 router.post('/signup', async (req, res) => {
-
     const user = new User(req.body)
     try {
         await User.findUsedEmails(req.body.email)
@@ -16,7 +15,11 @@ router.post('/signup', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(201).json({ ...others, token })
     } catch (err) {
-        res.status(400).json(err.message)
+        if (err.message === 'already used email') {
+            res.status(200).json(err.message)
+        } else {
+            res.status(400).json(err.message)
+        }
     }
 })
 
@@ -38,7 +41,16 @@ router.post('/login', async (req, res) => {
         }
         res.status(201).json({ ...others, token })
     } catch (err) {
-        res.status(400).json(err.message)
+        switch (err.message) {
+            case 'no account':
+                res.status(200).json({ err: 'No account' })
+                break;
+            case 'Wrong password':
+                res.status(200).json({ err: 'invalid password' })
+                break;
+            default:
+                res.status(400).json(err.message)
+        }
     }
 })
 

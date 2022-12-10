@@ -5,29 +5,29 @@ const Auth = require("../middleware/auth");
 const router = new express.Router();
 
 //get cart
-router.get("/cart", Auth, async (req, res) => {
+router.get("/cartitems", Auth, async (req, res) => {
     const owner = req.user._id;
     try {
         const cart = await Cart.findOne({ owner });
         if (cart && cart.items.length > 0) {
-            res.status(200).send(cart);
+            res.status(200).json(cart);
         } else {
-            res.send(null);
+            res.json("empty cart");
         }
     } catch (error) {
         res.status(500).send();
     }
 });
 
-//create cart
-router.post("/cart", Auth, async (req, res) => {
+//Add to cart
+router.post("/cartitems", Auth, async (req, res) => {
     const owner = req.user._id;
     const { itemId, quantity } = req.body;
     try {
         const cart = await Cart.findOne({ owner });
         const item = await Item.findOne({ _id: itemId });
         if (!item) {
-            res.status(404).send({ message: "item not found" });
+            res.status(404).json({ message: "item not found" });
             return;
         }
         const price = item.price;
@@ -39,19 +39,19 @@ router.post("/cart", Auth, async (req, res) => {
             if (itemIndex > -1) {
                 let product = cart.items[itemIndex];
                 product.quantity += quantity;
+                cart.items[itemIndex] = product;
                 cart.bill = cart.items.reduce((acc, curr) => {
                     return acc + curr.quantity * curr.price;
                 }, 0)
-                cart.items[itemIndex] = product;
                 await cart.save();
-                res.status(200).send(cart);
+                res.status(200).json(cart);
             } else {
                 cart.items.push({ itemId, name, quantity, price });
                 cart.bill = cart.items.reduce((acc, curr) => {
                     return acc + curr.quantity * curr.price;
                 }, 0)
                 await cart.save();
-                res.status(200).send(cart);
+                res.status(200).json(cart);
             }
         } else {
             //no cart exists, create one
@@ -60,15 +60,15 @@ router.post("/cart", Auth, async (req, res) => {
                 items: [{ itemId, name, quantity, price }],
                 bill: quantity * price,
             });
-            return res.status(201).send(newCart);
+            return res.status(201).json(newCart);
         }
     } catch (error) {
-        res.status(500).send("something went wrong");
+        res.status(500).json(error.message);
     }
 });
 
 //remove cart item
-router.delete("/cart/", Auth, async (req, res) => {
+router.delete("/cartitems/", Auth, async (req, res) => {
     const owner = req.user._id;
     const itemId = req.query.itemId;
     try {
@@ -85,13 +85,12 @@ router.delete("/cart/", Auth, async (req, res) => {
                 return acc + curr.quantity * curr.price;
             }, 0)
             cart = await cart.save();
-            res.status(200).send(cart);
+            res.status(200).json(cart);
         } else {
-            res.status(404).send("item not found");
+            res.status(404).json("item not found");
         }
     } catch (error) {
-        console.log(error);
-        res.status(400).send();
+        res.status(400).json(error.message);
     }
 });
 
