@@ -5,12 +5,18 @@ const cartRouter=require('../routers/cart')
 const cors = require('cors')
 require('../db/mongoose')
 const app = express()
+const path = require('path')
+const fileUpload=require('express-fileupload')
+
 
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
 }));
 
+
+app.use("/public", express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 app.use(express.json())
 const port = process.env.PORT
 app.use('/api/user',userRouter)
