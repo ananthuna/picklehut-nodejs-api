@@ -7,6 +7,7 @@ require('../db/mongoose')
 const app = express()
 const path = require('path')
 const fileUpload=require('express-fileupload')
+const fs=require('fs')
 
 
 app.use(cors({
@@ -14,8 +15,7 @@ app.use(cors({
     credentials: true,
 }));
 
-
-app.use("/public", express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.resolve('./public')));
 app.use(fileUpload());
 app.use(express.json())
 const port = process.env.PORT

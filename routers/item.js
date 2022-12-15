@@ -2,55 +2,32 @@ const express = require('express')
 const Item = require('../models/Item')
 const Auth = require('../middleware/auth')
 const router = new express.Router()
-const path = require('path')
-const multer = require('multer')
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/')
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-const upload = multer({ storage: storage }).single('file')
+const path = require('../public/path')
 
 
-
-
-// router.post('/imageUpload', async (req, res) => {
-//     console.log(req.files.file);
-//     console.log(req.body);
-// })  
 
 //create item
 router.post('/addItem', Auth, async (req, res) => {
-    console.log(req.files.file.name);
-    const imageFile = req.files.file
-    await upload(req,res,(err)=>{
+    let imageFile = req.files.file
 
-    })
-    // imageFile.mv(`${__dirname}/public/pickle.jpg`,
-    //     (err) => {
-    //         if (err) {
-    //             return res.status(500).send(err)
-    //         }
-    //     }
-    // )
-    // let item = JSON.parse(req.body.item)
-    //     console.log(item);
-    // try {
-    //     const newItem = new Item({
-    //         ...item,
-    //         owner: req.user._id,
-    //         imageUrl: `/public/${req.files.file.name}`
-    //     })
-    //     await newItem.save()
-    //     res.status(201).json(newItem)
-    // } catch (err) {
-    //     res.status(400).json(err.message)
-    // }
+    imageFile.mv(`${path.path}/${Date.now()}-${req.files.file.name}`, function (err) {
+        if (err) return console.log(err);
+        console.log('saved');
+    });
+
+    let item = JSON.parse(req.body.item)
+    console.log(item);
+    try {    
+        const newItem = new Item({
+            ...item,
+            owner: req.user._id,
+            url: `${Date.now()}-${req.files.file.name}`
+        })
+        await newItem.save()
+        res.status(201).json(newItem)
+    } catch (err) {
+        res.status(400).json(err.message)
+    }
 })
 
 //fetch item

@@ -18,23 +18,27 @@ const itemSchema = new mongoose.Schema(
             required: true
         },
         category: {
-            type: Array,
+            type: String,
             required: true
         },
         price: {
             type: Number,
             required: true
         },
-        url:{
-            type:String,
-            required:true
+        quantity: {
+            type: Number,
+            default: 0
         },
-        weight:{
-            type:String,
-            required:true
+        weight: {
+            type: Number,
+            required: true
         },
-        off:{
-            type:Number
+        offer: {
+            type: Number
+        },
+        url: {
+            type: String,
+            required: true
         }
     },
     {
