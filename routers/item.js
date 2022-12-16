@@ -5,23 +5,22 @@ const router = new express.Router()
 const path = require('../public/path')
 
 
-
 //create item
 router.post('/addItem', Auth, async (req, res) => {
     let imageFile = req.files.file
-
-    imageFile.mv(`${path.path}/${Date.now()}-${req.files.file.name}`, function (err) {
+    let name = `${Date.now()}-${req.files.file.name}`
+    imageFile.mv(`${path.path}/${name}`, function (err) {
         if (err) return console.log(err);
         console.log('saved');
     });
 
     let item = JSON.parse(req.body.item)
     console.log(item);
-    try {    
+    try {
         const newItem = new Item({
             ...item,
             owner: req.user._id,
-            url: `${Date.now()}-${req.files.file.name}`
+            url: name
         })
         await newItem.save()
         res.status(201).json(newItem)
