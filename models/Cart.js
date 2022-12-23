@@ -21,7 +21,15 @@ const cartSchema = new mongoose.Schema(
                 min: 1,
                 default: 1
             },
-            price:Number
+            price:Number,
+            weight: {
+                type: Number,
+                required: true
+            },
+            url: {
+                type: String,
+                required: true
+            }
         }],
         bill:{
             type:Number,

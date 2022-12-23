@@ -22,7 +22,7 @@ router.get("/cartitems", Auth, async (req, res) => {
 //Add to cart
 router.post("/cartitems", Auth, async (req, res) => {
     const owner = req.user._id;
-    const { itemId, quantity } = req.body;
+    const { itemId, quantity, price } = req.body;
     try {
         const cart = await Cart.findOne({ owner });
         const item = await Item.findOne({ _id: itemId });
@@ -30,8 +30,7 @@ router.post("/cartitems", Auth, async (req, res) => {
             res.status(404).json({ message: "item not found" });
             return;
         }
-        const price = item.price;
-        const name = item.name;
+        const { name, url, weight } = item
         //If cart already exists for user,
         if (cart) {
             const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
@@ -46,7 +45,7 @@ router.post("/cartitems", Auth, async (req, res) => {
                 await cart.save();
                 res.status(200).json(cart);
             } else {
-                cart.items.push({ itemId, name, quantity, price });
+                cart.items.push({ itemId, name, quantity, price, url, weight });
                 cart.bill = cart.items.reduce((acc, curr) => {
                     return acc + curr.quantity * curr.price;
                 }, 0)
@@ -57,7 +56,7 @@ router.post("/cartitems", Auth, async (req, res) => {
             //no cart exists, create one
             const newCart = await Cart.create({
                 owner,
-                items: [{ itemId, name, quantity, price }],
+                items: [{ itemId, name, quantity, price, url, weight }],
                 bill: quantity * price,
             });
             return res.status(201).json(newCart);
@@ -93,5 +92,32 @@ router.delete("/cartitems/", Auth, async (req, res) => {
         res.status(400).json(error.message);
     }
 });
+
+//Edit cart item quantity
+router.patch('/cartitems/:id', Auth, async (req, res) => {
+    const owner = req.user._id;
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['quantity']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    if (!isValidOperation) {
+        return res.status(400).json({ error: 'invalid updates' })
+    }
+    try {
+        const cart = await Cart.findOne({ owner });
+        const item = cart.items.every((item) => item.itemId == req.params.id)
+        if (!item) {
+            return res.status(404).json({ error: 'invalid product selection' })
+        }
+        cart.items.forEach((item) => item.quantity = req.body.quantity)
+        cart.bill = cart.items.reduce((acc, curr) => {
+            return acc + curr.quantity * curr.price;
+        }, 0)
+        await cart.save()
+        console.log(cart);
+        res.status(201).json(cart)
+    } catch (error) {
+        res.status(400).json(error.message)
+    }
+})
 
 module.exports = router;
