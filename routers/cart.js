@@ -3,6 +3,7 @@ const Cart = require("../models/Cart");
 const Item = require("../models/Item");
 const Auth = require("../middleware/auth");
 const router = new express.Router();
+const { ObjectId } = require('mongodb');
 
 //get cart
 router.get("/cartitems", Auth, async (req, res) => {
@@ -104,16 +105,24 @@ router.patch('/cartitems/:id', Auth, async (req, res) => {
     }
     try {
         const cart = await Cart.findOne({ owner });
-        const item = cart.items.every((item) => item.itemId == req.params.id)
+        const item = cart.items.every((item) => item.itemId === ObjectId(req.params.id))
+
+        console.log(item);
         if (!item) {
             return res.status(404).json({ error: 'invalid product selection' })
         }
-        cart.items.forEach((item) => item.quantity = req.body.quantity)
+        cart.items.forEach((item) => {
+            if (item.itemId == req.params.id) {
+                console.log(req.body.quantity);
+                if (req.body.quantity == '+') item.quantity += 1
+                if (req.body.quantity == '-') item.quantity -= 1
+            }
+        })
         cart.bill = cart.items.reduce((acc, curr) => {
             return acc + curr.quantity * curr.price;
         }, 0)
         await cart.save()
-        console.log(cart);
+        // console.log(cart);
         res.status(201).json(cart)
     } catch (error) {
         res.status(400).json(error.message)
