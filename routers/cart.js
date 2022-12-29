@@ -104,16 +104,13 @@ router.patch('/cartitems/:id', Auth, async (req, res) => {
         return res.status(400).json({ error: 'invalid updates' })
     }
     try {
-        const cart = await Cart.findOne({ owner });
-        const item = cart.items.every((item) => item.itemId === ObjectId(req.params.id))
-
-        console.log(item);
+        const cart = await Cart.findOne({ owner })
+        const item = cart.items.find((item) => item.itemId.toString() === req.params.id)
         if (!item) {
             return res.status(404).json({ error: 'invalid product selection' })
         }
         cart.items.forEach((item) => {
             if (item.itemId == req.params.id) {
-                console.log(req.body.quantity);
                 if (req.body.quantity == '+') item.quantity += 1
                 if (req.body.quantity == '-') item.quantity -= 1
             }
@@ -122,7 +119,6 @@ router.patch('/cartitems/:id', Auth, async (req, res) => {
             return acc + curr.quantity * curr.price;
         }, 0)
         await cart.save()
-        // console.log(cart);
         res.status(201).json(cart)
     } catch (error) {
         res.status(400).json(error.message)
