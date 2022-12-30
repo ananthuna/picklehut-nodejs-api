@@ -107,10 +107,15 @@ router.post('/updateProfile', Auth, async (req, res) => {
         }
         updates.forEach((update) => user[update] = req.body[update])
         await user.save()
-        const { password, tokens, ...others } = user._doc
+        const { password, tokens, ...others } = user._doc   
         res.status(201).json({ ...others })
     } catch (error) {
         res.status(400).json(error.message)
     }
+})
+
+//Add delivery address
+router.post('/address', Auth, async (req, res) => {
+    console.log(req.body);
 })
 module.exports = router
