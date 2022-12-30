@@ -79,4 +79,38 @@ router.post('/logoutAll', Auth, async (req, res) => {
         res.status(500).send()
     }
 })
+
+//profile info
+router.get('/profileinfo', Auth, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        const { password, tokens, ...others } = user._doc
+        res.status(200).json({ ...others })
+    } catch (err) {
+        res.status(401).json({ error: err.message })
+
+    }
+})
+
+//profile update
+router.post('/updateProfile', Auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['firstName', 'lastName', 'email', 'number']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    if (!isValidOperation) {
+        return res.status(400).json({ error: 'invalid updates' })
+    }
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        if (!user) {
+            return res.status(404).json({ error: 'invalid product selection' })
+        }
+        updates.forEach((update) => user[update] = req.body[update])
+        await user.save()
+        const { password, tokens, ...others } = user._doc
+        res.status(201).json({ ...others })
+    } catch (error) {
+        res.status(400).json(error.message)
+    }
+})
 module.exports = router
