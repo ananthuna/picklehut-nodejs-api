@@ -42,8 +42,8 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    number:{
-        type:Number
+    number: {
+        type: Number
     },
     tokens: [{
         token: {
@@ -51,6 +51,26 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }],
+    address: [{
+        address: {
+            type: String
+        },
+        village:{
+            type: String
+        },
+        city:{
+            type: String
+        },
+        state:{
+            type: String
+        },
+        pin:{
+            type: String
+        },
+        delivery:{
+            type: String
+        }
+    }]
 },
     {
         timestams: true

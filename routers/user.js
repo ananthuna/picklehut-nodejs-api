@@ -107,7 +107,7 @@ router.post('/updateProfile', Auth, async (req, res) => {
         }
         updates.forEach((update) => user[update] = req.body[update])
         await user.save()
-        const { password, tokens, ...others } = user._doc   
+        const { password, tokens, ...others } = user._doc
         res.status(201).json({ ...others })
     } catch (error) {
         res.status(400).json(error.message)
@@ -116,6 +116,52 @@ router.post('/updateProfile', Auth, async (req, res) => {
 
 //Add delivery address
 router.post('/address', Auth, async (req, res) => {
-    console.log(req.body);
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['address', 'village', 'city', 'state', 'pin', 'delivery']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    if (!isValidOperation) {
+        return res.status(400).json({ error: 'invalid address' })
+    }
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        if (!user) {
+            return res.status(404).json({ error: 'invalid user' })
+        }
+        const address = { ...req.body }
+        user.address = user.address.concat({ ...address })
+        await user.save()
+        const { Address, ...others } = user._doc
+        res.status(201).json(Address)
+    } catch (error) {
+        res.status(400).json(error.message)
+    }
+})
+
+//address
+router.get('/address', Auth, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        if (!user) return res.status(401).json('invalid user')
+        const { address, number, firstName, ...others } = user._doc
+        res.status(200).json({ address, number, firstName })
+    } catch (err) {
+        res.status(401).json(err.message)
+    }
+})
+
+//delete address
+router.delete('/address/', Auth, async (req, res) => {
+    const userId = req.user._id
+    const id = req.query.id
+    
+    try {
+        const user = await User.findOne({ _id: userId })
+        // const user = await User.findOne({})
+        removeByAttr(user.address,'_id',id)
+        console.log(user.address);
+        console.log('hai');
+    }catch(err){
+        console.log('err');
+    }
 })
 module.exports = router
