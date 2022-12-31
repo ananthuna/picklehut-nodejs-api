@@ -5,16 +5,18 @@ const wishListSchema = new mongoose.Schema(
     {
         owner: {
             type: ObjectID,
-            required: true,
-            ref: 'User'
+            required: true
         },
         items: [{
             itemId: {
                 type: ObjectID,
-                required: true,
-                ref: 'Item'
+                required: true
+            },
+            wish:{
+                type:Boolean,
+                require:true
             }
-        }],
+        }]
     },
     {
         timestamps: true

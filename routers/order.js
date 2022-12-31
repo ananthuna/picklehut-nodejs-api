@@ -24,3 +24,4 @@ router.get('/orders', Auth, async (req, res) => {
 router.get('/order/checkout', (req, res) => {
 
 })
+module.exports = router

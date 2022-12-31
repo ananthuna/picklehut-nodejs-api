@@ -2,6 +2,7 @@ const express = require('express')
 const userRouter=require('../routers/user')
 const itemRouter=require('../routers/item')
 const cartRouter=require('../routers/cart')
+const wishlistRouter=require('../routers/wishlist')
 const cors = require('cors')
 require('../db/mongoose')
 const app = express()
@@ -22,6 +23,7 @@ const port = process.env.PORT
 app.use('/api/user',userRouter)
 app.use('/api/item',itemRouter)
 app.use('/api/cart',cartRouter)
+app.use('/api/wishlist',wishlistRouter)
 
 
 app.listen(port,()=>{

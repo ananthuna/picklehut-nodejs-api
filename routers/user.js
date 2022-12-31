@@ -3,6 +3,7 @@ const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const Auth = require('../middleware/auth')
 const router = new express.Router()
+const { ObjectId } = require('mongodb');
 
 
 
@@ -153,15 +154,14 @@ router.get('/address', Auth, async (req, res) => {
 router.delete('/address/', Auth, async (req, res) => {
     const userId = req.user._id
     const id = req.query.id
-    
     try {
         const user = await User.findOne({ _id: userId })
-        // const user = await User.findOne({})
-        removeByAttr(user.address,'_id',id)
-        console.log(user.address);
-        console.log('hai');
-    }catch(err){
-        console.log('err');
+        const addressIndex = user.address.findIndex((item) => item._id == id);
+        user.address.splice(addressIndex, 1);
+        await user.save()
+        res.status(201).json(user.address)
+    } catch (err) {
+        res.status(401).json(err.message)
     }
 })
 module.exports = router
