@@ -11,10 +11,6 @@ const wishListSchema = new mongoose.Schema(
             itemId: {
                 type: ObjectID,
                 required: true
-            },
-            wish:{
-                type:Boolean,
-                require:true
             }
         }]
     },

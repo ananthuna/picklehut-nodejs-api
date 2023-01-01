@@ -5,7 +5,7 @@ const Item = require('../models/Item')
 
 const router = new express.Router()
 
-//get wishlist
+//get wishlist for icon
 router.get('/list', Auth, async (req, res) => {
     const owner = req.user._id
     try {
@@ -30,8 +30,7 @@ router.post('/list', Auth, async (req, res) => {
             const wishlist = new Wishlist({
                 owner,
                 items: [{
-                    itemId,
-                    wish: true
+                    itemId
                 }]
             })
             await wishlist.save()
@@ -42,17 +41,38 @@ router.post('/list', Auth, async (req, res) => {
             wishlist.items.forEach((item) => {
                 if (item.itemId == itemId) {
                     Item = item
-                    item.wish ? item.wish = false : item.wish = true
+                    const itemIndex = wishlist.items.findIndex((item) => item.itemId == itemId);
+                    wishlist.items.splice(itemIndex, 1);
                 }
             })
             if (!Item) {
-                wishlist.items = [...wishlist.items, { itemId, wish: true }]
+                wishlist.items = [...wishlist.items, { itemId }]
             }
             await wishlist.save()
             return res.status(201).json(wishlist)
         }
     } catch (err) {
         console.log(err.message);
+        res.status(401).json(err.message)
+    }
+})
+
+//get wishlist for page
+router.get('/wishlistitems', Auth, async (req, res) => {
+    const owner = req.user._id
+    let arry = []
+    try {
+        const wishlist = await Wishlist.findOne({ owner })
+        if (!wishlist) {
+            return res.status(401).json('invalid selection')
+        } else {
+            wishlist.items.forEach(async (item) => {
+                const Items = await Item.findOne({ _id: item.itemId })
+                arry = [...arry, Items]
+                wishlist.items.length === arry.length && res.status(200).json(arry)
+            })
+        }
+    } catch (err) {
         res.status(401).json(err.message)
     }
 })
