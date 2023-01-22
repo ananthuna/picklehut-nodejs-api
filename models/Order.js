@@ -8,15 +8,41 @@ const orderSchema = new mongoose.Schema(
             required: true,
             ref: 'User'
         },
-        items: [{
-            itemId: {
-                type: ObjectID,
-                required: true,
-                ref: 'Item'
+        orders: [{
+            amount: {
+                type: Number,
+                required: true
             },
-            status: {
-                type: String
-            }
+            address: {
+                type: ObjectID,
+                required: true
+            },
+            items: [{
+                itemId: {
+                    type: ObjectID,
+                    required: true,
+                    ref: 'Item'
+                },
+                name: {
+                    type: String,
+                    required: true
+                },
+                quantity: {
+                    type: Number,
+                    required: true
+                },
+                price: {
+                    type: Number,
+                    required: true
+                },
+                url: {
+                    type: String,
+                    required: true
+                },
+                status: {
+                    type: String
+                }
+            }]
         }]
     },
     {

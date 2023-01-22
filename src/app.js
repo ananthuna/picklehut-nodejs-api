@@ -1,14 +1,15 @@
 const express = require('express')
-const userRouter=require('../routers/user')
-const itemRouter=require('../routers/item')
-const cartRouter=require('../routers/cart')
-const wishlistRouter=require('../routers/wishlist')
+const userRouter = require('../routers/user')
+const itemRouter = require('../routers/item')
+const cartRouter = require('../routers/cart')
+const wishlistRouter = require('../routers/wishlist')
+const orderRouter = require('../routers/order')
 const cors = require('cors')
 require('../db/mongoose')
 const app = express()
 const path = require('path')
-const fileUpload=require('express-fileupload')
-const fs=require('fs')
+const fileUpload = require('express-fileupload')
+const fs = require('fs')
 
 
 app.use(cors({
@@ -20,12 +21,13 @@ app.use(express.static(path.resolve('./public')));
 app.use(fileUpload());
 app.use(express.json())
 const port = process.env.PORT
-app.use('/api/user',userRouter)
-app.use('/api/item',itemRouter)
-app.use('/api/cart',cartRouter)
-app.use('/api/wishlist',wishlistRouter)
+app.use('/api/user', userRouter)
+app.use('/api/item', itemRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/wishlist', wishlistRouter)
+app.use('/api/order', orderRouter)
 
 
-app.listen(port,()=>{
-    console.log("server is running on port:"+port);
+app.listen(port, () => {
+    console.log("server is running on port:" + port);
 })
