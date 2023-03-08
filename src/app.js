@@ -22,7 +22,7 @@ app.use(cors({
 app.use(express.static(path.resolve('./public')));
 app.use(fileUpload());
 app.use(express.json())
-const PORT = 3001
+const PORT = 3000
 
 app.use('/api/user', userRouter)
 app.use('/api/item', itemRouter)
