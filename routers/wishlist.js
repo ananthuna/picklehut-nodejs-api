@@ -18,6 +18,7 @@ router.get('/list', Auth, async (req, res) => {
 
 //add to wishlist
 router.post('/list', Auth, async (req, res) => {
+    console.log("addto wishlist");
     const owner = req.user._id
     const itemId = req.body.itemId
     try {

@@ -44,6 +44,7 @@ router.get('/items/:id', async (req, res) => {
 
 //fetch all items
 router.get('/items', async (req, res) => {
+    console.log('all items fetch');
     try {
         const items = await Item.find({})
         res.status(200).json(items)

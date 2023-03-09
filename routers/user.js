@@ -13,9 +13,13 @@ router.post('/signup', async (req, res) => {
     const user = new User(req.body)
     try {
         await User.findUsedEmails(req.body.email)
+        console.log('1');
         await user.save()
+        console.log('2');
         const { password, tokens, ...others } = user._doc
+        console.log('before token');
         const token = await user.generateAuthToken()
+        console.log('after token');
         res.status(201).json({ ...others, token })
     } catch (err) {
         if (err.message === 'already used email') {
@@ -31,9 +35,10 @@ router.post('/login', async (req, res) => {
     let token = req.body.token
     var decodedToken = jwt.decode(token, { complete: true });
     var dateNow = new Date();
-
+    
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
+        console.log(req.body);
         const { password, tokens, ...others } = user._doc
         if (!token) {
             token = await user.generateAuthToken()
@@ -139,11 +144,12 @@ router.post('/address', Auth, async (req, res) => {
     }
 })
 
-//address
+//get address
 router.get('/address', Auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user._id })
         if (!user) return res.status(401).json('invalid user')
+        console.log(user._doc);
         const { address, number, firstName, ...others } = user._doc
         res.status(200).json({ address, number, firstName })
     } catch (err) {
