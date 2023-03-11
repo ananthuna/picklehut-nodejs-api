@@ -5,4 +5,4 @@ mongoose.connect(MONGODB_URL, {
 useNewUrlParser: true,
 }).then(()=>console.log('database connected....'))
 const db = mongoose.connection;
-db.on("error", console  .error.bind(console, "MongoDB connection error:"));   
+db.on("error123", console  .error.bind(console, "MongoDB connection error:"));   

@@ -105,8 +105,9 @@ router.patch('/cartitems/:id', Auth, async (req, res) => {
     }
     try {
         const cart = await Cart.findOne({ owner })
-        const item = cart.items.find((item) => item.itemId.toString() === req.params.id)
+        const item = cart.items.filter((item) => item.itemId.toString() === req.params.id)
         if (!item) {
+            console.log('patch-404');
             return res.status(404).json({ error: 'invalid product selection' })
         }
         cart.items.forEach((item) => {

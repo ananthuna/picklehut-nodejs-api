@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
     let token = req.body.token
     var decodedToken = jwt.decode(token, { complete: true });
     var dateNow = new Date();
-    
+
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         console.log(req.body);
@@ -127,6 +127,7 @@ router.post('/address', Auth, async (req, res) => {
     const allowedUpdates = ['address', 'village', 'city', 'state', 'pin', 'delivery']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
     if (!isValidOperation) {
+        console.log('valid');
         return res.status(400).json({ error: 'invalid address' })
     }
     try {
@@ -134,11 +135,10 @@ router.post('/address', Auth, async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'invalid user' })
         }
-        const address = { ...req.body }
-        user.address = user.address.concat({ ...address })
+        user.address = user.address.concat({ ...req.body })
         await user.save()
-        const { Address, ...others } = user._doc
-        res.status(201).json(Address)
+        const { address, ...others } = user._doc
+        res.status(201).json(address)
     } catch (error) {
         res.status(400).json(error.message)
     }
@@ -149,7 +149,7 @@ router.get('/address', Auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user._id })
         if (!user) return res.status(401).json('invalid user')
-        console.log(user._doc);
+        // console.log(user._doc);
         const { address, number, firstName, ...others } = user._doc
         res.status(200).json({ address, number, firstName })
     } catch (err) {

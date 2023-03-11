@@ -4,21 +4,19 @@ const itemRouter = require('../routers/item')
 const cartRouter = require('../routers/cart')
 const wishlistRouter = require('../routers/wishlist')
 const orderRouter = require('../routers/order')
-// const port =require('../config/conf')
 const cors = require('cors')
 require('../db/mongoose')
 const app = express()
 const path = require('path')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
-// const { PORT } = require('../config/conf')
 
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-}));
-// app.use(express.static('./build'));
+// app.use(cors({
+//     origin: 'http://localhost:3000',
+//     credentials: true,
+// }));
+app.use(express.static('./build'));
 app.use(express.static(path.resolve('./public')));
 
 app.use(fileUpload());
